@@ -41,6 +41,7 @@ The basic steps in using Chameleon are:
 2. Create *k*-fold cross-validation partitions with `chameleon-data kfold`,
 
 *The folowing steps have not been implemented and may be subject to change*
+
 3. Select and run feature selection models followed by prediction models with `chameleon-pipe`. Alternatively, run feature selection with `chameleon feat` and/or prediction with `chameleon trainpredict`.
 5. Run performance evaluation and visualisation tools using `chameleon-results`
 
@@ -82,6 +83,7 @@ $ chameleon-data kfold --xfile proc_data/X_foo.pkl --yfile proc_data/y_foo.npy -
 The default *k* is 5, but can be set using `--k`. The *k*-fold method is stratified by default but can be suppressed using the `--not-stratified` flag. Similarly, the data will be normalised by default unless the `--no-normalise` flag is included.
 This command will create a new folder in the current directory called `kfold_myproblem` that will contain *k* files in the format `fold1of*k*.pkl`. These files contain the unique sets of training and test data for the fold.
 
+*The folowing steps have not been implemented and may be subject to change*
 
 ### 3. ...
 Now we can run feature selection and classification with the `chameleon` command. The subcommands `feat` and `trainpredict` both start a command line interfaces (CLI) where we can set parameters, then perform feature selection and classification, respectively. The `pipe` subcommand will do this all in one. The parameters include things such as the datasets, feature selection algorithms, classifiers, etc.
