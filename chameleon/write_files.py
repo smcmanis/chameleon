@@ -24,17 +24,4 @@ def write_dictionary(dic, outdir, fname):
     outfile = os.path.join(outdir, fname)
     pickle.dump(dic, open(outfile, 'wb'))
 
-def write_feature_pipe(files, selector_list, outdir, fname):
-    outfile = open(os.path.join(outdir, fname), "w")
-    file_list = " ".join(files)
-    algorithm_list = " ".join(selector_list)
-    outfile.write(f"declare -a fileList=( {file_list} )")
-    outfile.write(f"declare -a algorithmList=( {algorithm_list} )")
-
-    outfile.write('\n')
-    outfile.write('for alg in "${algorithmList[@]}"; do')
-    outfile.write('    for file in "${file_list[@]}"; do')
-    outfile.write('        echo "running $alg algorithm for $file"')
-    outfile.write('        $FS_PROJECT_PATH/src/bash/run-feature.sh $alg fold')
-    # outfile.write()
 
