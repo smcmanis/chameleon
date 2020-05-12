@@ -90,17 +90,17 @@ The config file can be manually edited without issue.
 To start, create the config file and specify the feature selection algorithms with the following command: 
  
 ```bash
-$ chameleon-feature add -d kfold_myproblem 
+$ chameleon features -d kfold_myproblem 
 ```
 Where `-d` specifies the directory containing your problem. This will create a dictionary with keys for each data .pkl file in the kfold_myproblem directory. Each key will have a list of associated feature selection algorithms and an empty list for optionally adding classifiers later. The config dictionary is saved in the `kfold_myproblem/configs` directory as a json file named `pipe.json`, but this file name can be specified using the `--name` option. 
 
 By default, all six of the feature selection algorithms will be added, but this can be overidden using the `--algorithm` (-a) option to specify single algorithms. For example, if you just want to use SVM-RFE and iterative_MI, you would instead run:
 
 ```bash
-$ chameleon-feature add -d kfold_myproblem -a SVM-RFE -a iterative_MI
+$ chameleon features -d kfold_myproblem -a SVM-RFE -a iterative_MI
 ```
 
-Currently, chameleon supports adding to the config file by running the `c`hameleon-feature add` command multiple times, but the only way to remove added parameters is to manually edit the config file.
+Currently, chameleon supports adding to the config file by running the `chameleon-feature add` command multiple times, but the only way to remove added parameters is to manually edit the config file.
 
 
 ### 4. Optionally add/configure classifiers
@@ -108,7 +108,14 @@ Currently, chameleon supports adding to the config file by running the `c`hamele
 *coming soon*
 
 ### 5. Run the test suite
+Run the test suite with the config parameters with:
 
-
+```bash
+$ chameleon run -d kfold_myproblem -c kfold_myproblem/configs/pipe.json
+```
 
 *The folowing steps have not been implemented and may be subject to change*
+
+By default, this will be very inefficient and run each file + algorithm specified in the config one-by-one. This is usualy okay for most use cases, but could be result in extreme runtimes for some cases. The `--method` option  can improve on this. Each algorithm + file combination can be submitted as a job through the Slurm batch system by using `--method slurm`. Alternatively, use `--method multithread` for multithreading.  
+
+
