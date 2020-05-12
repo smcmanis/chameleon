@@ -1,6 +1,7 @@
 import fileinput
 import os
 import pickle
+import json
 
 import numpy as np
 import pandas as pd
@@ -25,3 +26,6 @@ def write_dictionary(dic, outdir, fname):
     pickle.dump(dic, open(outfile, 'wb'))
 
 
+def write_json(data, dest):
+    with open(dest, 'w') as outfile:
+        json.dump(data, outfile)
