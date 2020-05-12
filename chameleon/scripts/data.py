@@ -79,7 +79,7 @@ def format_entrypoint(ftype: str,
 @click.option("--random_seed", type=int, default=666,
               help="Random state for assigning data to folds")
 @click.option("--name", type=str, required=True,
-              help="Name of the output folder")
+              help="Name of the output folder e.g. myproblem will create kfold_myproblem")
 @click.option("--normalise/--no-normalise", is_flag=True, default=True,
               help="Normalise the the data ")
 @click.option("--stratified/--not-stratified", is_flag=True, default=True,
