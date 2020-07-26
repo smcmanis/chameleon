@@ -71,7 +71,7 @@ def run(datafile, algorithm):
     df = read.read_pandas(datafile)
     X = df['X_train']
         
-    y = df['y_train']
+    y = df['y_train'].flatten()
 
 
 
