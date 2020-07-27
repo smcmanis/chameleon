@@ -147,25 +147,25 @@ There are two subcommands: `chameleon-data format` and `chameleon-data kfold`.
 Required:
 Option | Argument | Description
 | --- | --- | --- |
-`--ftype` | STRING | Type of data file to format. Choices are `mat` and `arff`.
-`--fpath` | DIRECTORY | Path to the raw data file.
-`--name` | STRING | Name of output files e.g. '--name foo' will make files foo_X.pkl and foo_y.npy.
+`--ftype` | `STRING` | Type of data file to format. Choices are `mat` and `arff`.
+`--fpath` | `DIRECTORY` | Path to the raw data file.
+`--name` | `STRING` | Name of output files e.g. '--name foo' will make files foo_X.pkl and foo_y.npy.
 
 #### kfold
 Required:
 Option | Argument | Description
 | --- | --- | --- | 
-`--xfile` | .PKL | The name of the X data. e.g. '--Xfile proc_data/foo_X.pkl'
-`--yfile` | .NPY | The name of the y data. e.g. '--yfile proc_data/foo_y.npy'
-`--name` | STRING | Name of the output folder e.g. myproblem will create kfold_myproblem.
+`--xfile` | `.PKL` | The name of the X data. e.g. '--Xfile proc_data/foo_X.pkl'
+`--yfile` | `.NPY` | The name of the y data. e.g. '--yfile proc_data/foo_y.npy'
+`--name` | `STRING` | Name of the output folder e.g. myproblem will create kfold_myproblem.
 
 Optional:
 Option | Argument | Default | Description
 | --- | --- | --- | --- |
-`--k` | INT | 5 |  The number of folds to partition the data".
-`--random_seed` | INT | 666 |  Random state for assigning data to folds.
-`--normalise/--no-normalise` |  | TRUE |  Whether to normalise the data.
-`--stratified/--not-stratified` |  | TRUE |  Whether to apply stratified kfold.
+`--k` | `INT` | 5 |  The number of folds to partition the data".
+`--random_seed` | `INT` | 666 |  Random state for assigning data to folds.
+`--normalise/--no-normalise` |  | True |  Whether to normalise the data.
+`--stratified/--not-stratified` |  | True |  Whether to apply stratified kfold.
 
 ### chameleon-pipe
 There are three subcommands: `chameleon-pipe pipe`, `chameleon-pipe features`, and `chameleon-pipe classifiers`.
@@ -175,7 +175,7 @@ All available feature selection methods and classifiers are added to the pipelin
 Arguments for `--featureselector`/`-f`:
 Argument | Description
 | --- | --- | 
-`fischer`` | Fischer score
+`fischer` | Fischer score
 `reliefF` | reliefF
 `random-forest` | Random forest feature importance
 `SVM-RFE` | SVM recursive feature elimination
@@ -185,7 +185,7 @@ Argument | Description
 Arguments for `--classifier`/`-c`:
 Argument | Description
 | --- | --- | 
-`naive-bayes`` | Guassian Naive Bayes
+`naive-bayes` | Guassian Naive Bayes
 `kNN` | k-nearest neighbours
 `logistic-regression` | Logistic regession
 `neural-net` | Neural network (multilayer perceptron)
@@ -196,37 +196,37 @@ Argument | Description
 Required:
 Option | Argument | Description
 | --- | --- | --- |
-`--data`/`-d` | DIRECTORY | The folder containing the prepared data e.g. kfold_myproblem.
+`--data`/`-d` | `DIRECTORY` | The folder containing the prepared data e.g. kfold_myproblem.
 
 Optional:
 Option | Argument | Default | Description
 | --- | --- | --- | --- |
-`--featureselector`/`-f` | STRING |  |  Name of feature selection algorithms to add to the pipeline.
-`--classifier`/`-c` | STRING |  |  Name of classifier algorithms to add to the pipeline.
-`--name`/`-n` | STRING | pipe |  Name for the pipeline configuration file.
+`--featureselector`/`-f` | `STRING` |  |  Name of feature selection algorithms to add to the pipeline.
+`--classifier`/`-c` | `STRING` |  |  Name of classifier algorithms to add to the pipeline.
+`--name`/`-n` | `STRING` | pipe |  Name for the pipeline configuration file.
 
 #### features
 Required:
 Option | Argument | Description
 | --- | --- | --- |
-`--data`/`-d` | DIRECTORY | The folder containing the prepared data e.g. kfold_myproblem.
+`--data`/`-d` | `DIRECTORY` | The folder containing the prepared data e.g. kfold_myproblem.
 
 Optional:
 Option | Argument | Default | Description
 | --- | --- | --- | --- |
 `--featureselector`/`-f` | STRING |  |  Name of feature selection algorithms to add to the pipeline.
-`--name`/`-n` | STRING | pipe |  Name for the pipeline configuration file.
+`--name`/`-n` | `STRING` | pipe |  Name for the pipeline configuration file.
 
 #### classifiers
 Required:
 Option | Argument | Description
 | --- | --- | --- |
-`--configpath`/`-p` | .JSON | The path to the pipeline config file.
+`--configpath`/`-p` | `.JSON` | The path to the pipeline config file.
 
 Optional:
 Option | Argument | Description
 | --- | --- | --- | 
-`--classifier`/`-c` | STRING |  Name of classifier algorithms to add to the pipeline.
+`--classifier`/`-c` | `STRING` |  Name of classifier algorithms to add to the pipeline.
 
 ### chameleon
 There is one subcommand: `chameleon run`.
@@ -234,13 +234,13 @@ There is one subcommand: `chameleon run`.
 Required:
 Option | Argument | Description
 | --- | --- | --- |
-`--data`/`-d` | DIRECTORY | The folder containing the prepared data e.g. kfold_myproblem.
-`--pipe`/`-p` | .JSON | The relative path to the pipe config file.
+`--data`/`-d` | `DIRECTORY` | The folder containing the prepared data e.g. kfold_myproblem.
+`--pipe`/`-p` | `.JSON` | The relative path to the pipe config file.
 
 Optional:
 Option | Argument | Default | Description
 | --- | --- | --- | --- |
-`--method`/`-m` | STRING | normal |  The method for running the program. Options are `normal` and `slurm`.
-`--featureselection` | BOOL | True |  Whether to run feature selection.
-`--predict` | BOOL | True |  Whether to run classification.
-`--n_features`/`-n` | INT | 50 | Number of features to use in classifier predictions (the top 'n' features).
+`--method`/`-m` | `STRING` | normal |  The method for running the program. Options are `normal` and `slurm`.
+`--featureselection` | `BOOL` | True |  Whether to run feature selection.
+`--predict` | BOOL | `True` |  Whether to run classification.
+`--n_features`/`-n` | `INT` | 50 | Number of features to use in classifier predictions (the top 'n' features).
