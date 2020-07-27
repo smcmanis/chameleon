@@ -47,7 +47,10 @@ def iterative_MI(X, y, **kwargs):
     mi_calc_type = kwargs.get('mi_calc_type', 'kraskov')
     mi_class = mi_class_types[mi_calc_type]
     cond_mi_class = cond_mi_class_types[mi_calc_type]
-    
+
+    # debug output
+    verbose = kwargs.get('verbose', False)
+
     y = binarise_y(y)
     
     # Initialise calculator
@@ -84,7 +87,6 @@ def iterative_MI(X, y, **kwargs):
             for cand_idx in range(0,len(candidates_to_add)):
                 candidate = candidates_to_add[cand_idx]
                 candidate_data = X[:, candidate]
-                # print('MI for virtual sens number %d cond on: ', candidate)
                 if(len(conditional_features) > 0):
                     try:
                         if len(conditional_features) == 1:
@@ -121,7 +123,8 @@ def iterative_MI(X, y, **kwargs):
         best_MI = sorted_MIs[0]
 
         best_canditate_idx = candidates_to_add[sorted_indices[0]]
-        print(f'Best virtual sensor to add is {best_canditate_idx}, giving MI {best_MI} bits/nats')
+        if verbose:
+            print(f'Best virtual sensor to add is {best_canditate_idx}, giving MI {best_MI} bits/nats')
         # Check the statistical significance of the conditional MI value:
         candidate_data = X[:,best_canditate_idx]
         if(len(conditional_features) > 0):
@@ -145,7 +148,8 @@ def iterative_MI(X, y, **kwargs):
                 m_dist = cond_mi_calc.computeSignificance(False, num_samples)
             except:
                 mi = 0
-                print("Java CholeskyDecomposition Exception during MI calculation or stat significance check")
+                if verbose:
+                    print("Java CholeskyDecomposition Exception during MI calculation or stat significance check")
                 list_zeros = np.concatenate((np.zeros(num_samples),np.ones(num_samples)))
                 j_j = jp.JArray(jp.JDouble, 1)(list_zeros)
                 m_dist_dummy_class = jp.JClass('infodynamics.utils.EmpiricalMeasurementDistribution')
@@ -162,9 +166,11 @@ def iterative_MI(X, y, **kwargs):
         signif_level = t.cdf(t_value, num_samples)
         if signif_level > 1 - p_value_threshold:
             passed_stats_test = True
-            print(' --> accepted at p=%f' % signif_level)
+            if verbose:
+                print(' --> accepted at p=%f' % signif_level)
         else:
-            print(' --> rejected at p=%f' % signif_level)
+            if verbose:
+                print(' --> rejected at p=%f' % signif_level)
             passed_stats_test = False
         accepting_feature = False
         if passed_stats_test:
@@ -175,38 +181,40 @@ def iterative_MI(X, y, **kwargs):
                 redundancy_idx = len(selected_features)
             if continue_redundant:
                 if len(conditional_features) > 0:
-                    print('Clearing set of variables to condition on, and trying to select redundant variables')
+                    if verbose:
+                        print('Clearing set of variables to condition on, and trying to select redundant variables')
                     conditional_features = []
                     conditional_features_changed = True
-                    print(len(conditional_features))
                     last_feat_added_success = False
                 else:
-                    print('Accepting variable anyway, since we''re forcing redundant selection and are not conditioning on any variables at this round')
+                    if verbose:
+                        print('Accepting variable anyway, since we''re forcing redundant selection and are not conditioning on any variables at this round')
                     accepting_feature = True
                     insignificant_features.append(best_canditate_idx)
                     last_feat_added_success = True
             else:
                 last_feat_added_success = False
-                print('Terminating forward feature selection as we have reached maximum prescribed number of sensors: %d of %d' % (len(selected_features), max_features))                
+                if verbose:
+                    print('Terminating forward feature selection as we have reached maximum prescribed number of sensors: %d of %d' % (len(selected_features), max_features))                
                 break
         
         if accepting_feature:
-            print('Accepted as %dth virtual sensor' % (len(selected_features) + 1))
+            if verbose:
+                print('Accepted as %dth virtual sensor' % (len(selected_features) + 1))
             ####################################
             selected_features.append(best_canditate_idx)
             if conditional:
                 conditional_features.append(best_canditate_idx)
                 conditional_features_changed = True
-                print(len(conditional_features))
             if reached_max_conditional_features:
                 conditional_features = []
                 conditional_features_changed = True
-                print('Clearing set of variables to condition on, since we''ve reached %d of them' % max_features)
+                if verbose:
+                    print('Clearing set of variables to condition on, since we''ve reached %d of them' % max_features)
             ####################################
             MIs.append(mi)
             surrogate_MIs.append(surrogate_MI)
             surrogate_MI_stds.append(surrogate_MI_std)
-            print('removing best from canddiates to add')
             candidates_to_add = candidates_to_add[candidates_to_add != best_canditate_idx ]
         ####################################
     # return the results
