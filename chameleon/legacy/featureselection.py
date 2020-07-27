@@ -70,10 +70,7 @@ def apply_RF(X, y, **kwargs):
 def run(datafile, algorithm):
     df = read.read_pandas(datafile)
     X = df['X_train']
-        
     y = df['y_train'].flatten()
-
-
 
     if algorithm == 'fischer':
         feature_idx = apply_fischer(X, y)

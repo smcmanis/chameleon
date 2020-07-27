@@ -33,6 +33,7 @@ or, if you plan on doing development
 $ pip install -e /path/to/chameleon/.
 ```
 
+
 ## Outline
 
 The basic steps in using Chameleon are:
