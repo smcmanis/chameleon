@@ -24,13 +24,13 @@ While not necessary, Chameleon is optimised for using job scheduled high-perform
 Clone the repository to your desired directory and simply run
 
 ```bash
-$ pip install /path/to/chameleon/.
+$ pip install .
 ```
 
 or, if you plan on doing development
 
 ```bash
-$ pip install -e /path/to/chameleon/.
+$ pip install -e .[dev]
 ```
 
 
