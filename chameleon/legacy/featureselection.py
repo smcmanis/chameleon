@@ -4,6 +4,8 @@ import time
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import LinearSVC
+from sklearn.feature_selection import RFE
+
 
 import chameleon.write_files as write
 import chameleon.read_files as read
@@ -79,6 +81,7 @@ def run(datafile, algorithm):
         feature_idx = apply_reliefF(X, y, k=n_neighbours)
     elif algorithm == 'SVM-RFE':
         step = 1
+        n_features = 50
         feature_idx, rfe = apply_SVM_RFE(X, y, n_features=n_features, step=step)
     elif algorithm == 'random-forest':
         n_estimators = 100

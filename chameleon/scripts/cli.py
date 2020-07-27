@@ -1,5 +1,6 @@
 import os
 from typing import List
+from pprint import pprint
 
 import click
 import numpy as np
@@ -105,16 +106,21 @@ def features_entrypoint(data: str,
     if os.path.exists(config_file):
         config = read.read_json(config_file)
     else:
-        config = {}
+        datafiles = fileio.datafiles(data)
+        config = {'data': [f for f in datafiles]}
 
-    datafiles = fileio.datafiles(data)
+    # datafiles = fileio.datafiles(data)
+    
+    # for dfile in datafiles:
+    #     dfile_config = config.get(dfile, {})
+    #     selectors = dfile_config.get("feature_algorithms", [])
+    #     new_fs = list(set(featureselector)- set(selectors))
+    #     dfile_config['feature_algorithms'] = selectors + new_fs
+    #     config[dfile] = dfile_config
 
-    for dfile in datafiles:
-        dfile_config = config.get(dfile, {})
-        selectors = dfile_config.get("feature_algorithms", [])
-        new_fs = list(set(featureselector)- set(selectors))
-        dfile_config['feature_algorithms'] = selectors + new_fs
-        config[dfile] = dfile_config
+    selectors = config.get("feature_selection", [])
+    new_fs = list(set(featureselector) - set(selectors))
+    config['feature_selection'] = selectors + new_fs
 
     write.write_json(config, config_file)
     
@@ -144,15 +150,25 @@ def classifiers_entrypoint(configpath: str,
                         classifier: List[str]
                         ) -> None:
     config = read.read_json(configpath)
-    for pipe in config.values():
-        clfs = pipe.get("classifiers", [])
-        new_clfs = list(set(classifier)- set(clfs))
-        pipe['classifiers'] = clfs + new_clfs
+    
+    # for pipe in config.values():
+    #     clfs = pipe.get("classifiers", [])
+    #     new_clfs = list(set(classifier)- set(clfs))
+    #     pipe['classifiers'] = clfs + new_clfs
+
+    classifiers = config.get("classifiers", [])
+    new_clfs = list(set(classifier) - set(classifiers))
+    config['classifiers'] = classifiers + new_clfs
     
     write.write_json(config, configpath)
     
 
 
+@cli.command()
+@click.option("-p", "--pipe", 
+            type=click.Path(exists=True),
+            required=True, 
+            help="The relative path to the pipe config file")
 @click.option("-d", "--data", 
             type=click.Path(exists=True),
             required=True, 
@@ -160,34 +176,85 @@ def classifiers_entrypoint(configpath: str,
 # @click.option("--excludefile", type=str,
 #                 multiple=True,
 #                 help="The name of a file in the --data dir to exclude")
-@click.option("--method", 
-            type=click.Choice(["normal", "multithread", "slurm"]),
+@click.option("-m", "--method", 
+            type=click.Choice(["normal", "slurm"]),
             default="normal",
-            help="Select the method for running the program. slurm submits the suite as a collection of jobs via Slurm, multithread sets multithreading on")
+            help="Select the method for running the program. With 'normal', the pipelines will be executed iteratively, and with 'slurm', the pipelines are submitted as a collection of jobs via Slurm")
+@click.option("--feature_selection", 
+            type=bool,
+            default=True,
+            help="Run feature selection in pipeline")
+@click.option("--predict", 
+            type=bool,
+            default=True,
+            help="Run predictions in pipeline")
+@click.option("-n", "--n_features", 
+            type=int,
+            default=50,
+            help="Number of features to use in classifier predictions (the top 'n' features)")    
 @click.pass_context
 def run(ctx: click.Context,
-            configfile: str,
+            pipe: str,
             data: str,
-            method: str
+            method: str,
+            feature_selection: bool,
+            predict: bool,
+            n_features: int
             ) -> None:
     """Run the config suite"""
     catching_f = errors.catch_and_exit(run_entrypoint)
-    catching_f(configfile, data, method)
+    catching_f(pipe, data, method, feature_selection, predict, n_features)
 
 
-def run_entrypoint(configfile: str,
+def run_entrypoint(pipe: str,
                     data: str,
-                    method: str
+                    method: str,
+                    feature_selection: bool,
+                    predict: bool,
+                    n_features: tuple
                     ) -> None:
-    config = read.read_json(configfile)
+    config = read.read_json(pipe)
+
+    feature_dir = os.path.join(data, "features")
+    if not os.path.exists(feature_dir):
+        os.makedirs(feature_dir)
+
+    # Can probably be done more efficiently
     if method == 'normal':
-        for file in config.keys():
-            for alg in config[file]['feature_algorithms']:
-                fpath = os.path.join(data, file)
-            if feature_selection:
-                run_feature_selection(config, file, data, feature_dir)
-            if predict:
-                run_predictions(config, file, data, feature_dir, predictions_dir, range)
+        results = {}
+        if feature_selection: 
+            run_feature_selection(config, data, feature_dir)
+        if predict:
+            results = run_predictions(config, data, feature_dir, n_features)
+            pprint(results)
+    
 
+    
+def run_feature_selection(config, data_dir, feature_dir):
+    for file in config['data']:
+        fpath = os.path.join(data_dir, file)
+        for alg in config['feature_selection']:
+            feature_idx = featureselection.run(fpath, alg)
+            # Remove .pkl from fold filename
+            fname = f"{file[:-4]}_{alg}.npy"
+            write.write_numpy(feature_idx, feature_dir, fname)
 
+def run_predictions(config, data_dir, feature_dir, n_features):
+    results = {}
+    for alg in config['feature_selection']:
+        results[alg] = {}
+        for clf in config['classifiers']:
+            aggregate_score = 0
+            for file in config['data']:
+                features_fname = f"{file[:-4]}_{alg}.npy"
+                features_path = os.path.join(feature_dir, features_fname) 
+                feature_idx = read.read_numpy(features_path)
+                data_path = os.path.join(data_dir, file)
+                score = classify.run(data_path, clf, feature_idx, n_features)
+                aggregate_score += score
+            avg_score = aggregate_score / len(config['data'])
+            results[alg][clf] = avg_score
+
+    return results
+        
 
