@@ -214,7 +214,7 @@ Option | Argument | Description
 Optional:
 Option | Argument | Default | Description
 | --- | --- | --- | --- |
-`--featureselector`/`-f` | STRING |  |  Name of feature selection algorithms to add to the pipeline.
+`--featureselector`/`-f` | `STRING` |  |  Name of feature selection algorithms to add to the pipeline.
 `--name`/`-n` | `STRING` | pipe |  Name for the pipeline configuration file.
 
 #### classifiers
@@ -242,5 +242,5 @@ Option | Argument | Default | Description
 | --- | --- | --- | --- |
 `--method`/`-m` | `STRING` | normal |  The method for running the program. Options are `normal` and `slurm`.
 `--featureselection` | `BOOL` | True |  Whether to run feature selection.
-`--predict` | BOOL | `True` |  Whether to run classification.
+`--predict` | `BOOL` | True |  Whether to run classification.
 `--n_features`/`-n` | `INT` | 50 | Number of features to use in classifier predictions (the top 'n' features).
