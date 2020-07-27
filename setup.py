@@ -8,6 +8,7 @@ setup(
     entry_points={
         "console_scripts": [
             "chameleon-data = chameleon.scripts.data:cli",
+            "chameleon-pipe = chameleon.scripts.pipe:cli",
             "chameleon = chameleon.scripts.cli:cli"
         ]
     },

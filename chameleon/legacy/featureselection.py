@@ -11,7 +11,7 @@ import chameleon.write_files as write
 import chameleon.read_files as read
 from chameleon.legacy.skfeature.function.similarity_based import fisher_score, reliefF
 
-# from chameleon.legacy.mutual_information import iterative_greedy, simple_MI
+import chameleon.legacy.mutual_information as mi
 
 
 
@@ -31,7 +31,7 @@ def apply_SVM_RFE(X, y, **kwargs):
     step = kwargs.get('step', 1) 
     feature_subset = np.arange(X.shape[1])
     feature_idx_elimination_order = []
-    for i in range(n_features, 0, -1):
+    for i in range(n_features, 0, -step):
         X_set = X[:, feature_subset]
         svc = LinearSVC()
         rfe = RFE(svc, i, step=step, verbose=1)
@@ -54,20 +54,6 @@ def apply_RF(X, y, **kwargs):
     return selected_features
 
 
-# def apply_iterative_MI(dataset, fold_idx, version, **kwargs):
-#     results = iterative_greedy(
-#         dataset,    
-#         fold_idx, 
-#         version, 
-#         **kwargs)
-#     return results
-
-
-# def apply_simple_MI(dataset, fold_idx, version, **kwargs):
-#     selected_features = simple_MI(dataset, fold_idx, version)
-#     return selected_features
-
-
 
 def run(datafile, algorithm):
     df = read.read_pandas(datafile)
@@ -75,38 +61,22 @@ def run(datafile, algorithm):
     y = df['y_train'].flatten()
 
     if algorithm == 'fischer':
-        feature_idx = apply_fischer(X, y)
+        return apply_fischer(X, y)
     elif algorithm == 'reliefF':
         n_neighbours = 5
-        feature_idx = apply_reliefF(X, y, k=n_neighbours)
+        return apply_reliefF(X, y, k=n_neighbours)
     elif algorithm == 'SVM-RFE':
         step = 1
         n_features = 50
-        feature_idx, rfe = apply_SVM_RFE(X, y, n_features=n_features, step=step)
+        feature_idx, _ = apply_SVM_RFE(X, y, n_features=n_features, step=step)
+        return feature_idx
     elif algorithm == 'random-forest':
         n_estimators = 100
-        feature_idx = apply_RF(X, y, n_estimators=n_estimators)
-    # elif algorithm == 'iterative_MI':
-    #     results = apply_iterative_MI(
-    #         dataset,    
-    #         fold_idx, 
-    #         version, 
-    #         X=X, 
-    #         y=y, 
-    #         max_features=n_features)
-    #     feature_idx = results['selected_features']
-    # elif algorithm == 'simple_MI':
-    #     feature_idx = apply_simple_MI(
-    #         dataset,    
-    #         fold_idx, 
-    #         version, 
-    #         X=X, 
-    #         y=y)
-
-    # Log runtime
-    # runtime = time.time() - start_time
-    # file_access.log_runtime(runtime, dataset, fold_idx, version, selector)
-
-    # Save feature selection output
-    # save_features(feature_idx, dataset, fold_idx, version, selector)
-    return feature_idx
+        return apply_RF(X, y, n_estimators=n_estimators)
+    elif algorithm == 'iterative_MI':
+        n_features = 50
+        results = mi.iterative_MI(X, y, max_features=n_features)
+        return results['selected_features']
+    elif algorithm == 'simple_MI':
+        return mi.simple_MI(X, y)
+    
