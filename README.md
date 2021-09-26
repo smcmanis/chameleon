@@ -1,7 +1,7 @@
 # chameleon
 
-\[One-sentence summary\]
-
+This software has been further developed by Diviya Thilakeswaran, the repository can be found [here](https://github.com/diviyat/chameleon
+).
 
 ## Introduction
  \[Features, background, about, etc.\]
